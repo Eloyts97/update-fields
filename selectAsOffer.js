@@ -1,20 +1,22 @@
 //Inicializa variables
 let table = base.getTable('Tarifa');
-let records = await table.selectRecordsAsync({fields: ['Quantity', '% DTO', 'Selected', 'OFFER']});
+let records = await table.selectRecordsAsync({fields: ['Quantity']});
+
+// get OFFER record to link in OFFER field
+let offerTable = base.getTable('OFFER');
+let offerRecords = await offerTable.selectRecordsAsync({fields: []});
 
 let updateRecords = [];
 
 if (records.records.length > 0) {
     records.records.forEach(record => {
-        // set null for fields to reset
-        if (record.getCellValue('Quantity') > 0 || record.getCellValue('Selected') == true || record.getCellValue('% DTO') > 0) {
+        // set null for number fields and '' for text fields
+        if (record.getCellValue('Quantity') > 0) {
             updateRecords.push({
                 id: record.id, 
                 fields: {
-                    'Quantity': null,
-                    '% DTO': null,
-                    'Selected': false,
-                    'OFFER': null
+                    'Selected': true,
+                    'OFFER': [{id: offerRecords.records[0].id}]
                 }
             });
         }
